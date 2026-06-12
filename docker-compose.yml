@@ -1,0 +1,22 @@
+version: '3.9'
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: indexforge-postgres
+    environment:
+      POSTGRES_DB: indexforge
+      POSTGRES_USER: indexforge
+      POSTGRES_PASSWORD: indexforge
+    ports:
+      - "5432:5432"
+    volumes:
+      - indexforge_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U indexforge"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  indexforge_pgdata:
