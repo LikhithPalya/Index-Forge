@@ -23,3 +23,8 @@ Thumbs.db
 
 # Environment
 .env
+
+# Data files
+*.csv
+*.json
+data/

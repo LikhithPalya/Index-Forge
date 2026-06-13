@@ -1,12 +1,12 @@
-package com.indexforge;
+package com.indexforge.search;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class IndexForgeApplication {
+public class IndexForgeSearchApplication {
 
     public static void main(String[] args) {
-        SpringApplication.run(IndexForgeApplication.class, args);
+        SpringApplication.run(IndexForgeSearchApplication.class, args);
     }
 }
