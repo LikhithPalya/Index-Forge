@@ -1,24 +1,30 @@
 package com.indexforge.search.config;
 
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.web.reactive.function.client.WebClient;
+
+import java.time.Duration;
 
 /**
- * Application configuration.
- *
- * TODO: Add beans for:
- *   - RestTemplate or WebClient for embedding provider API calls
- *   - Embedding provider configuration (API key, model, dimension)
- *   - Search configuration (default result limit, min similarity threshold)
+ * Application configuration for IndexForge Search.
+ * Configures the WebClient used to communicate with the embedding service.
  */
 @Configuration
 public class AppConfig {
 
-    // TODO: Configure HTTP client for embedding provider
-    // @Bean
-    // public RestTemplate restTemplate() {
-    //     return new RestTemplateBuilder()
-    //             .setConnectTimeout(Duration.ofSeconds(10))
-    //             .setReadTimeout(Duration.ofSeconds(30))
-    //             .build();
-    // }
+    @Value("${embedding.service.base-url}")
+    private String embeddingServiceBaseUrl;
+
+    @Bean
+    public WebClient embeddingServiceWebClient() {
+        return WebClient.builder()
+                .baseUrl(embeddingServiceBaseUrl)
+                .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+                .defaultHeader(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
+                .build();
+    }
 }

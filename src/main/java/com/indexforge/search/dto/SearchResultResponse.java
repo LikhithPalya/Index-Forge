@@ -4,7 +4,7 @@ import lombok.*;
 
 /**
  * Response DTO for a single semantic search result.
- * Contains the matched animal and its similarity score.
+ * Contains the matched animal with its similarity score.
  */
 @Getter
 @Setter
@@ -15,6 +15,11 @@ public class SearchResultResponse {
 
     private Long animalId;
     private String animalName;
-    private String description;
     private Double similarityScore;
+    private String description;
+    private String wikipediaSummary;
+    private String habitat;
+    private String diet;
+    private String family;
+    private String conservationStatus;
 }

@@ -25,6 +25,8 @@ public class AnimalResponse {
     private String predators;
     private String averageSpeed;
     private String countriesFound;
+    private String family;
+    private String conservationStatus;
     private String description;
     private String wikipediaSummary;
     private LocalDateTime createdAt;

@@ -59,6 +59,8 @@ public class AnimalService {
                 .predators(animal.getPredators())
                 .averageSpeed(animal.getAverageSpeed())
                 .countriesFound(animal.getCountriesFound())
+                .family(animal.getFamily())
+                .conservationStatus(animal.getConservationStatus())
                 .description(animal.getDescription())
                 .wikipediaSummary(animal.getWikipediaSummary())
                 .createdAt(animal.getCreatedAt())

@@ -20,33 +20,52 @@ public interface AnimalRepository extends JpaRepository<Animal, Long> {
      */
     List<Animal> findAllByOrderByNameAsc();
 
-    // TODO: Implement vector similarity search
-    // This method will perform cosine similarity search using pgvector.
-    // It will:
-    //   1. Accept a query embedding vector (as String in pgvector format)
-    //   2. Use the <=> operator for cosine distance
-    //   3. Return animals ranked by similarity
-    //   4. Include the similarity score in the result
-
     /**
      * Semantic similarity search using pgvector cosine distance.
+     * Uses the IVFFlat index on the embedding column for approximate nearest neighbor search.
      *
-     * TODO: Uncomment and use once QueryEmbeddingService is implemented.
+     * The query:
+     * - Casts the input string to a pgvector vector type
+     * - Uses the <=> operator for cosine distance
+     * - Computes similarity as 1 - cosine_distance
+     * - Orders results by distance (most similar first)
+     * - Limits to topK results
      *
-     * @param queryEmbedding the query embedding vector as a pgvector-compatible string
-     * @param limit maximum number of results
-     * @return list of [Animal fields..., similarity_score] ordered by similarity
+     * @param queryVector the query embedding vector as a pgvector-compatible string, e.g. "[0.1,0.2,...]"
+     * @param topK maximum number of results to return
+     * @return list of projected results ordered by cosine similarity (descending)
      */
     @Query(value = """
-            SELECT a.id, a.name, a.description, 
-                   1 - (a.embedding_vector <=> CAST(:queryEmbedding AS vector)) AS similarity_score
+            SELECT
+                a.id AS id,
+                a.name AS name,
+                a.description AS description,
+                a.wikipedia_summary AS wikipediaSummary,
+                a.habitat AS habitat,
+                a.diet AS diet,
+                a.family AS family,
+                a.conservation_status AS conservationStatus,
+                1 - (a.embedding <=> CAST(:queryVector AS vector)) AS similarityScore
             FROM animals a
-            WHERE a.embedding_vector IS NOT NULL
-            ORDER BY a.embedding_vector <=> CAST(:queryEmbedding AS vector)
-            LIMIT :limit
+            WHERE a.embedding IS NOT NULL
+            ORDER BY a.embedding <=> CAST(:queryVector AS vector)
+            LIMIT :topK
             """, nativeQuery = true)
-    List<Object[]> findBySemanticSimilarity(
-            @Param("queryEmbedding") String queryEmbedding,
-            @Param("limit") int limit
+    List<AnimalSearchProjection> findBySemanticSimilarity(
+            @Param("queryVector") String queryVector,
+            @Param("topK") int topK
     );
+
+    /**
+     * Verify that pgvector extension is available.
+     * Used for startup health check.
+     */
+    @Query(value = "SELECT COUNT(*) FROM pg_extension WHERE extname = 'vector'", nativeQuery = true)
+    int checkPgvectorExtension();
+
+    /**
+     * Count animals that have embeddings populated.
+     */
+    @Query(value = "SELECT COUNT(*) FROM animals WHERE embedding IS NOT NULL", nativeQuery = true)
+    long countWithEmbeddings();
 }
